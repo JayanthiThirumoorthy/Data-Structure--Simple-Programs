@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *left, *right;
+};
+
+// Function to create a new node
+struct Node* newNode(int data) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+    node->data = data;
+    node->left = node->right = NULL;
+    return node;
+}
+
+// Function to calculate height of the tree
+int height(struct Node* node) {
+    if (node == NULL)
+        return 0;
+    int lheight = height(node->left);
+    int rheight = height(node->right);
+    
+    return (lheight > rheight) ? (lheight + 1) : (rheight + 1);
+}
+
+// Function to print nodes at a given level
+void printCurrentLevel(struct Node* root, int level) {
+    if (root == NULL)
+        return;
+    if (level == 1)
+        printf("%d ", root->data);
+    else if (level > 1) {
+        printCurrentLevel(root->left, level - 1);
+        printCurrentLevel(root->right, level - 1);
+    }
+}
+
+// Function to print level-order traversal of tree
+void levelOrder(struct Node* root) {
+    int h = height(root);
+    for (int i = 1; i <= h; i++) {
+        printCurrentLevel(root, i);
+        printf("\n");
+    }
+}
+
+int main() {
+    // Creating the tree
+    struct Node* root = newNode(1);
+    root->left = newNode(2);
+    root->right = newNode(3);
+    root->left->left = newNode(4);
+    root->left->right = newNode(5);
+
+    printf("Level Order Traversal of binary tree is: \n");
+    levelOrder(root);
+    
+    return 0;
+}
