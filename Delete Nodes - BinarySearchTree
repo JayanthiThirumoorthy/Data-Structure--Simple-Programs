@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+struct Node* createNode(int data) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+    node->data = data;
+    node->left = NULL;
+    node->right = NULL;
+    return node;
+}
+
+struct Node* findMin(struct Node* root) {
+    while (root->left != NULL) root = root->left;
+    return root;
+}
+
+struct Node* deleteNode(struct Node* root, int data) {
+    if (root == NULL) return root;
+
+    if (data < root->data) {
+        root->left = deleteNode(root->left, data);
+    } else if (data > root->data) {
+        root->right = deleteNode(root->right, data);
+    } else {
+        if (root->left == NULL) {
+            struct Node* temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            struct Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        struct Node* temp = findMin(root->right);
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp->data);
+    }
+    return root;
+}
+
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+
+int main() {
+    struct Node* root = createNode(5);
+    root = insertNode(root, 3);
+    root = insertNode(root, 7);
+    root = insertNode(root, 2);
+    root = insertNode(root, 4);
+    root = insertNode(root, 6);
+    root = insertNode(root, 8);
+
+    printf("Original Tree: ");
+    inorder(root);
+    printf("\n");
+
+    printf("Enter node to delete: ");
+    int data;
+    scanf("%d", &data);
+    root = deleteNode(root, data);
+
+    printf("Tree after deletion: ");
+    inorder(root);
+    printf("\n");
+
+    return 0;
+}
