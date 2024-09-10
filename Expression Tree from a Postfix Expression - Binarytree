@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+struct Node {
+    char data;
+    struct Node *left, *right;
+};
+
+// Function to create a new node
+struct Node* newNode(char data) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+    node->data = data;
+    node->left = node->right = NULL;
+    return node;
+}
+
+// Function to check if the character is an operator
+int isOperator(char ch) {
+    return (ch == '+' || ch == '-' || ch == '*' || ch == '/');
+}
+
+// Stack for storing tree nodes
+struct Node* stack[100];
+int top = -1;
+
+void push(struct Node* node) {
+    stack[++top] = node;
+}
+
+struct Node* pop() {
+    return stack[top--];
+}
+
+// Function to build the expression tree
+struct Node* buildExpressionTree(char postfix[]) {
+    for (int i = 0; postfix[i] != '\0'; i++) {
+        if (!isOperator(postfix[i])) {
+            push(newNode(postfix[i]));
+        } else {
+            struct Node* opNode = newNode(postfix[i]);
+            opNode->right = pop();
+            opNode->left = pop();
+            push(opNode);
+        }
+    }
+    return pop();
+}
+
+// Function to evaluate the expression tree
+int evaluate(struct Node* root) {
+    if (root == NULL)
+        return 0;
+
+    if (!isOperator(root->data))
+        return root->data - '0';
+
+    int leftEval = evaluate(root->left);
+    int rightEval = evaluate(root->right);
+
+    switch (root->data) {
+        case '+': return leftEval + rightEval;
+        case '-': return leftEval - rightEval;
+        case '*': return leftEval * rightEval;
+        case '/': return leftEval / rightEval;
+    }
+    return 0;
+}
+
+// Inorder traversal of expression tree
+void inorder(struct Node* root) {
+    if (root == NULL)
+        return;
+    inorder(root->left);
+    printf("%c ", root->data);
+    inorder(root->right);
+}
+
+int main() {
+    char postfix[] = "53+82-*";  // Example postfix expression
+
+    struct Node* root = buildExpressionTree(postfix);
+    
+    printf("Inorder traversal of the expression tree: ");
+    inorder(root);
+    printf("\n");
+
+    printf("Evaluation of expression tree: %d\n", evaluate(root));
+
+    return 0;
+}
